@@ -1,0 +1,15 @@
+# Zindi GeoAI Aquaculture Pond Identification Challenge
+# Solution by Jisoo TriAiiag (rank 6 of 1,318)
+# Python 3.10+ — CPU only, no GPU required
+#
+# Install with:  pip install -r requirements.txt
+
+lightgbm==4.3.0
+catboost==1.2.5
+scikit-learn==1.5.0
+pandas==2.2.0
+numpy==1.26.0
+
+# Notebook (optional — only needed to run the annotated walkthrough)
+jupyter==1.0.0
+ipykernel==6.29.0

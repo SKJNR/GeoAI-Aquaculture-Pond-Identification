@@ -1,0 +1,30 @@
+# Default configuration for the GeoAI Aquaculture Pond Identification solution.
+# Values mirror src/config.py — edit one or the other, not both.
+
+model:
+  scale_pos_weight: 2.0
+  k_aug: 8                  # augmented copies per fold
+  n_splits: 5               # 5-fold StratifiedGroupKFold
+  exact_test_positives: 560 # measured via all-positive probe submission
+  random_state: 42
+
+lightgbm:
+  max_depth: 5
+  num_leaves: 18
+  subsample: 0.80
+  colsample_bytree: 0.90
+  reg_alpha: 0.3
+  reg_lambda: 2.0
+  min_child_samples: 20
+  learning_rate: 0.04
+  n_estimators: 500
+
+catboost:
+  iterations: 600
+  depth: 5
+  learning_rate: 0.04
+  l2_leaf_reg: 3
+
+data:
+  bands: [VH, VV, blue, green, nir, nira, re1, re2, re3, red, swir1, swir2]
+  sentinels: [-9999, -999, -32768, 9999]

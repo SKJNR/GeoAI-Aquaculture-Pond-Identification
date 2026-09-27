@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main, v2]
+  pull_request:
+    branches: [main, v2]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Syntax-check all source modules
+        run: |
+          python -m py_compile src/*.py
+          python -m py_compile tests/*.py
+
+      - name: Run sanity tests
+        run: pytest tests/ -v
+
+      - name: Verify feature count is exactly 59
+        run: |
+          python -c "
+          import sys; sys.path.insert(0, '.')
+          import pandas as pd, numpy as np
+          from src.config import BANDS
+          from src.features import build_features
+          # Toy 1-row frame
+          cols = {}
+          for b in BANDS:
+              for m in range(1, 13):
+                  cols[f'{b}_{m:02d}'] = [0.5]
+          df = pd.DataFrame(cols)
+          feats = build_features(df)
+          assert feats.shape[1] == 59, f'Expected 59 features, got {feats.shape[1]}'
+          print(f'OK: 59 features confirmed')
+          "
+
+      - name: Verify notebook JSON is valid
+        run: |
+          python -c "
+          import json
+          with open('notebook/Solution_Notebook_v2.ipynb') as f:
+              nb = json.load(f)
+          assert nb['nbformat'] == 4
+          assert len(nb['cells']) >= 20, f'Expected >=20 cells, got {len(nb[\"cells\"])}'
+          print(f'OK: notebook has {len(nb[\"cells\"])} cells')
+          "
